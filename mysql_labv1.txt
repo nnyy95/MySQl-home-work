@@ -1,0 +1,55 @@
+﻿0. 每個辦公室的業績狀況表 
+
+
+select e.officecode,sum(d.quantityordered * d.priceeach) as totl
+from employees as e 
+join customers as c on (e.employeenumber = c.salesrepemployeenumber)
+join orders o on (o.customernumber = c.customernumber)
+join orderdetails d on (d.ordernumber = o.ordernumber)
+group by e.officecode;
+
+1. 業務業績排行榜, procedure (加上時間，區間)
+create view mysales as
+select  e.employeenumber,  e.firstname,e.lastname ,o.orderdate,o.status,d.quantityordered*d.priceeach as totl   
+from employees as  e
+join customers as c on (e.employeenumber = salesrepemployeenumber)
+join orders as o on (o.customernumber = c.customernumber)
+join orderdetails as d on (d.ordernumber = o.ordernumber)
+
+DELIMITER $$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `mysales`()
+BEGIN
+ select * from mysales where status = 'Shipped'
+ group by employeenumber
+ order by totl desc;
+END$$
+DELIMITER ;
+
+ 
+2. 熱銷商品排行榜, procedure
+(加上時間，區間)
+
+create view mysales as
+select  p.productname, p.quantityordered    
+from products as p
+join orderdetails as d on (p.productcode = d.productcode)
+
+DELIMITER $$
+CREATE DEFINER=`root`@`localhost` PROCEDURE `mysales`()
+BEGIN
+ select * from mysales where status = 'Shipped'
+ group by employeenumber
+ order by totl desc;
+END$$
+DELIMITER ;
+
+3. 業務訂單取消的比例 orders.sttaus = canceled
+
+
+
+4. 低於商品建議售價95%->'MSRP'的訂單及其實際售價
+
+
+
+
+5. 當訂單資料被修改及刪除的時候記錄在 log 資料表中, (時間及所有資料欄位)
